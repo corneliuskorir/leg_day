@@ -13,9 +13,10 @@ class Workout(db.Model):
     notes = db.Column(db.String)
 
     @validates("notes")
-    def notes_validation(self, value):
+    def notes_validation(self, key, value):
         if not value.strip():
             raise ValueError("Note cannot be empty")
+        return value
 
     workout_exercises = db.relationship("WorkoutExercise", back_populates="workout")
     exercises = association_proxy(

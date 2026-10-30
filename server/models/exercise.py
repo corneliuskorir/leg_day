@@ -13,12 +13,14 @@ class Exercise(db.Model):
     equipment_needed = db.Column(db.Boolean, default=False)
 
     @validates("name")
-    def name_validation(self, value):
+    def name_validation(self, key, value):
         if not value.strip() or len(value.strip()) < 1:
             raise ValueError("Invalid name, can not be empty.")
         unique = db.session.query(Exercise.id).filter_by(name=value).first()
         if unique is not None:
             raise ValueError("This name already exists.")
+
+        return value
 
     workout_exercises = db.relationship("WorkoutExercise", back_populates="exercise")
     workouts = association_proxy(
