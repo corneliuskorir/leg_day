@@ -1,4 +1,6 @@
 from ..database import db
+from sqlalchemy.ext.associationproxy import association_proxy
+from .workout_exercises import WorkoutExercise
 
 
 class Workout(db.Model):
@@ -10,3 +12,8 @@ class Workout(db.Model):
     notes = db.Column(db.String)
 
     workout_exercises = db.relationship("WorkoutExercise", back_populates="workout")
+    exercises = association_proxy(
+        "workout_exercises",
+        "exercise",
+        creator=lambda exercise_obj: WorkoutExercise(exercise=exercise_obj),
+    )
