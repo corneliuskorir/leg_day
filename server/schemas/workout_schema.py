@@ -10,11 +10,11 @@ class WorkoutSchema(Schema):
     duration_minutes = fields.Int(allow_none=True)
     notes = fields.String(allow_none=False)
 
-    workout_exercises = fields.List(
-        fields.Nested("WorkoutExerciseSchema", exclude=("workout", "exercise"))
-    )
     exercises = fields.List(
         fields.Nested("ExerciseSchema", exclude=("workouts", "workout_exercises"))
+    )
+    workout_exercises = fields.List(
+        fields.Nested("WorkoutExerciseSchema", exclude=("workout", "exercise"))
     )
 
     @post_load

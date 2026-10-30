@@ -9,14 +9,15 @@ class ExerciseSchema(Schema):
     category = fields.String(required=True)
     equipment_needed = fields.Boolean(load_default=False)
 
+    workouts = fields.List(
+        fields.Nested("WorkoutSchema", exclude=("exercises", "workout_exercises"))
+    )
     workout_exercises = fields.List(
         fields.Nested("WorkoutExerciseSchema", exclude=("exercise", "workout"))
     )
 
-    workouts = fields.List(fields.Nested("WorkoutSchema", exclude=("exercises",)))
-
     @validates("category")
-    def validates_category_type(self, value):
+    def validates_category_type(self, value, **kwargs):
         allowed_categories = ["Chest", "Legs", "Arms", "Back", "Core"]
         if value not in allowed_categories:
             raise ValidationError(
