@@ -10,3 +10,6 @@ class WorkoutExercise(db.Model):
     reps = db.Column(db.Integer)
     sets = db.Column(db.Integer)
     duration_seconds = db.Column(db.Integer)
+
+    workout = db.relationship("Workout", back_populates="workout_exercises")
+    exercise = db.relationship("Workout", back_populates="workout_exercises")

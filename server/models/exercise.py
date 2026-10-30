@@ -8,3 +8,5 @@ class Exercise(db.Model):
     name = db.Column(db.String, nullable=False)
     category = db.Column(db.String, nullable=False)
     equipment_needed = db.Column(db.Boolean, default=False)
+
+    workout_exercises = db.relationship("WorkoutExercise", back_populates="workout")
