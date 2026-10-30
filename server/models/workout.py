@@ -10,7 +10,7 @@ class Workout(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     date = db.Column(db.Date)
     duration_minutes = db.Column(db.Integer)
-    notes = db.Column(db.String)
+    notes = db.Column(db.String, nullable=False)
 
     @validates("notes")
     def notes_validation(self, key, value):

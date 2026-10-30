@@ -2,6 +2,7 @@ from flask import Flask, make_response, request
 from flask_migrate import Migrate
 from .database import db
 from .models import *
+from .schemas import *
 
 
 def create_app():
