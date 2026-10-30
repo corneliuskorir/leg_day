@@ -24,21 +24,45 @@ def create_app():
     # workouts
     @app.route("/workouts", methods=["GET"])
     def get_workouts():
+        workouts = Workout.query.all()
+        if workouts:
+            res = WorkoutSchema(many=True).dumps(workouts)
+            return make_response(res, 200)
 
-        return make_response({"message": "get workouts"}, 200)
+        return make_response({"error": "We cant find any workouts."}, 404)
 
     @app.route("/workouts", methods=["POST"])
     def create_workouts():
-        data = request.get_json()
-        return make_response({"message": "post workouts"}, 201)
+        try:
+            data = request.get_json()
+            workout = WorkoutSchema().load(data)
+            db.session.add(workout)
+            db.session.commit()
+            return make_response({"message": "Workout created successfully"}, 201)
+        except Exception as e:
+            return make_response({"error": f"Failed to create workout: {e}"})
 
     @app.route("/workouts/<id>", methods=["GET"])
     def get_workout(id):
-        return make_response({"message": f"get workouts"}, 200)
+        workout = Workout.query.filter_by(id=id).first()
+        if workout is not None:
+            res = WorkoutSchema().dumps(workout)
+            return make_response(res, 200)
+        return make_response({"error": f"Failed to find workout: id[{id}]"}, 404)
 
     @app.route("/workouts/<id>", methods=["DELETE"])
     def delete_workout(id):
-        return make_response({"message": f"get workouts"}, 204)
+        try:
+            workout = Workout.query.filter_by(id=id).first()
+            if workout is not None:
+                db.session.delete(workout)
+                db.session.commit()
+                return make_response(
+                    {"message": f"Workout '{workout.name}' deleted."}, 204
+                )
+            raise Exception("Workout not found")
+        except Exception as e:
+            return make_response({"error": f"Failed to delete workout: {e}"}, 404)
 
     # exercises
     @app.route("/exercises", methods=["GET"])
