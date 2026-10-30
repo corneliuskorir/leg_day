@@ -24,45 +24,105 @@ def create_app():
     # workouts
     @app.route("/workouts", methods=["GET"])
     def get_workouts():
-        return make_response({"message": "get workouts"}, 200)
+        workouts = Workout.query.all()
+        if workouts:
+            res = WorkoutSchema(many=True).dumps(workouts)
+            return make_response(res, 200)
+
+        return make_response({"error": "We cant find any workouts."}, 404)
 
     @app.route("/workouts", methods=["POST"])
     def create_workouts():
-        data = request.get_json()
-        return make_response({"message": "post workouts"}, 201)
+        try:
+            data = request.get_json()
+            workout = WorkoutSchema().load(data)
+            db.session.add(workout)
+            db.session.commit()
+            return make_response({"message": "Workout created successfully"}, 201)
+        except Exception as e:
+            return make_response({"error": f"Failed to create workout: {e}"})
 
     @app.route("/workouts/<id>", methods=["GET"])
     def get_workout(id):
-        return make_response({"message": f"get workouts"}, 200)
+        workout = Workout.query.filter_by(id=id).first()
+        if workout is not None:
+            res = WorkoutSchema().dumps(workout)
+            return make_response(res, 200)
+        return make_response({"error": f"Failed to find workout: id[{id}]"}, 404)
 
     @app.route("/workouts/<id>", methods=["DELETE"])
     def delete_workout(id):
-        return make_response({"message": f"get workouts"}, 204)
+        try:
+            workout = Workout.query.filter_by(id=id).first()
+            if workout is not None:
+                db.session.delete(workout)
+                db.session.commit()
+                return make_response({"message": f"Workout '{id}' deleted."}, 204)
+            raise Exception("Workout not found")
+        except Exception as e:
+            return make_response({"error": f"Failed to delete workout: {e}"}, 404)
 
     # exercises
     @app.route("/exercises", methods=["GET"])
     def get_exercises():
-        return make_response({"message": "get exercises"}, 200)
+        exercises = Exercise.query.all()
+        if exercises:
+            res = ExerciseSchema(many=True).dumps(exercises)
+            return make_response(res, 200)
+
+        return make_response({"error": "We cant find any Exercises."}, 404)
 
     @app.route("/exercises", methods=["POST"])
     def create_exercises():
-        data = request.get_json()
-        return make_response({"message": "post exercises"}, 201)
+        try:
+            data = request.get_json()
+            exercise = ExerciseSchema().load(data)
+            db.session.add(exercise)
+            db.session.commit()
+            return make_response({"message": "Exercise created successfully"}, 201)
+        except Exception as e:
+            return make_response({"error": f"Failed to create exercise: {e}"})
 
     @app.route("/exercises/<id>", methods=["GET"])
     def get_exercise(id):
-        return make_response({"message": f"get exercises"}, 200)
+        exercise = Exercise.query.filter_by(id=id).first()
+        if exercise is not None:
+            res = ExerciseSchema().dumps(exercise)
+            return make_response(res, 200)
+        return make_response({"error": f"Failed to find exercise: id[{id}]"}, 404)
 
     @app.route("/exercises/<id>", methods=["DELETE"])
     def delete_exercise(id):
-        return make_response({"message": f"get exercises"}, 204)
+        try:
+            exercise = Exercise.query.filter_by(id=id).first()
+            if exercise is not None:
+                db.session.delete(exercise)
+                db.session.commit()
+                return make_response({"message": f"Workout '{id}' deleted."}, 204)
+            raise Exception("Excersise not found")
+        except Exception as e:
+            return make_response({"error": f"Failed to delete exercise: {e}"}, 404)
 
     @app.route(
         "/workouts/<workout_id>/exercises/<exercise_id>/workout_exercises",
         methods=["POST"],
     )
     def create_workout_exercises(workout_id, exercise_id):
-        data = request.get_json()
-        return make_response({"message": "post workout exercises"}, 201)
+        try:
+            data = request.get_json() | {
+                "workout_id": workout_id,
+                "exercise_id": exercise_id,
+            }
+            we = WorkoutExerciseSchema().load(data)
+            db.session.add(we)
+            db.session.commit()
+            return make_response(
+                {
+                    "message": f"Workout {workout_id} with exercise {exercise_id} created successfully"
+                },
+                201,
+            )
+        except Exception as e:
+            return make_response({"error": f"Failed to create exercise: {e}"})
 
     return app
