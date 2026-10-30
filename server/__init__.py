@@ -1,5 +1,6 @@
 from flask import Flask, make_response, request
 from flask_migrate import Migrate
+from .database import db
 
 
 def create_app():
@@ -9,6 +10,10 @@ def create_app():
     app.config["DEBUG"] = True
 
     # add migrations
+
+    migrate = Migrate(app, db)
+
+    db.init_app(app)
 
     @app.route("/")
     def home():
