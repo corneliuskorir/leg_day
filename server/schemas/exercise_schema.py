@@ -1,5 +1,6 @@
 # Exercise schema
-from marshmallow import Schema, fields, validate, validates, ValidationError
+from marshmallow import Schema, fields, validate, validates, ValidationError, post_load
+from ..models import Exercise
 
 
 class ExerciseSchema(Schema):
@@ -21,3 +22,7 @@ class ExerciseSchema(Schema):
             raise ValidationError(
                 f"Category must be one of: {', '.join(allowed_categories)}"
             )
+
+    @post_load
+    def to_exercise(self, data, **kwargs):
+        return Exercise(**data)

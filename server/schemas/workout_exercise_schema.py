@@ -1,5 +1,6 @@
 # workout exercise schema
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_load
+from ..models import WorkoutExercise
 
 
 class WorkoutExerciseSchema(Schema):
@@ -12,3 +13,7 @@ class WorkoutExerciseSchema(Schema):
 
     workout = fields.Nested("WorkoutSchema", exclude=("workout_exercises",))
     exercise = fields.Nested("ExerciseSchema", exclude=("workout_exercises",))
+
+    @post_load
+    def to_workout_exersise(self, data, **kwargs):
+        return WorkoutExercise(**data)

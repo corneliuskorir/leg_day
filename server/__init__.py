@@ -24,6 +24,7 @@ def create_app():
     # workouts
     @app.route("/workouts", methods=["GET"])
     def get_workouts():
+
         return make_response({"message": "get workouts"}, 200)
 
     @app.route("/workouts", methods=["POST"])
